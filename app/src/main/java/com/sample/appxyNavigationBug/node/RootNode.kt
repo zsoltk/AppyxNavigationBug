@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.BackStackModel
 import com.bumble.appyx.components.backstack.operation.newRoot
+import com.bumble.appyx.components.backstack.operation.push
 import com.bumble.appyx.components.backstack.ui.slider.BackStackSlider
 import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
 import com.bumble.appyx.navigation.modality.NodeContext
@@ -39,7 +40,7 @@ class RootNode(
         super.onChildFinished(child)
         when (child) {
             is LoginNode -> {
-                backStack.newRoot(Routing.Main)
+                backStack.push(Routing.Main)
             }
         }
     }

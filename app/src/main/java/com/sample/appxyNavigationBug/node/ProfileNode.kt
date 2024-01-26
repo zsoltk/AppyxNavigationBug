@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
 import com.bumble.appyx.navigation.modality.NodeContext
 import com.bumble.appyx.navigation.node.Node
 import com.bumble.appyx.navigation.node.node
+import kotlin.random.Random
 
 class ProfileNode(
     nodeContext: NodeContext,
@@ -44,7 +46,7 @@ class ProfileNode(
             Routing.Profile -> {
                 node(nodeContext = nodeContext) {
                     Log.i("ProfileNode", "buildChildNode: Routing.Profile")
-                    val (number, setNumber) = remember { mutableIntStateOf(0) }
+                    val (number, setNumber) = rememberSaveable { mutableIntStateOf(0) }
                     Column(
                         modifier = it
                             .fillMaxSize()
@@ -64,6 +66,16 @@ class ProfileNode(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        AppyxNavigationContainer(appyxComponent = backStack)
+        val counter = rememberSaveable { Random.nextInt(32) }
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color.DarkGray),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Local UI state $counter")
+            AppyxNavigationContainer(appyxComponent = backStack)
+        }
     }
 }
