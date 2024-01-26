@@ -13,18 +13,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.bumble.appyx.navigation.modality.NodeContext
-import com.bumble.appyx.navigation.node.LeafNode
+import com.bumble.appyx.navigation.modality.BuildContext
+import com.bumble.appyx.navigation.node.Node
 
 class XYZNode(
-    nodeContext: NodeContext,
-) : LeafNode(
-    nodeContext = nodeContext
+    buildContext: BuildContext,
+) : Node(
+    buildContext = buildContext
 ) {
     private var number: Int by mutableIntStateOf(0)
 
     @Composable
-    override fun Content(modifier: Modifier) {
+    override fun View(modifier: Modifier) {
         Column(
             modifier = modifier
                 .fillMaxSize()

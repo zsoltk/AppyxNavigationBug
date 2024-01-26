@@ -23,20 +23,21 @@ import com.bumble.appyx.components.spotlight.Spotlight
 import com.bumble.appyx.components.spotlight.SpotlightModel
 import com.bumble.appyx.components.spotlight.operation.activate
 import com.bumble.appyx.components.spotlight.ui.slider.SpotlightSlider
-import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
-import com.bumble.appyx.navigation.modality.NodeContext
+import com.bumble.appyx.navigation.composable.AppyxComponent
+import com.bumble.appyx.navigation.modality.BuildContext
 import com.bumble.appyx.navigation.node.Node
+import com.bumble.appyx.navigation.node.ParentNode
 import kotlin.random.Random
 
 class BottomNavNode(
-    nodeContext: NodeContext,
+    buildContext: BuildContext,
     spotlightModel: SpotlightModel<Routing> = SpotlightModel(
         items = Routing.entries,
-        savedStateMap = nodeContext.savedStateMap,
+        savedStateMap = buildContext.savedStateMap,
     ),
     val spotlight: Spotlight<Routing> = Spotlight(
         model = spotlightModel,
-        visualisation = { SpotlightSlider(it, spotlightModel.currentState) },
+        visualisation = { SpotlightSlider(it) },
         gestureFactory = {
             SpotlightSlider.Gestures(
                 transitionBounds = it,
@@ -45,8 +46,8 @@ class BottomNavNode(
             )
         }
     )
-) : Node<BottomNavNode.Routing>(
-    nodeContext = nodeContext,
+) : ParentNode<BottomNavNode.Routing>(
+    buildContext = buildContext,
     appyxComponent = spotlight
 ) {
 
@@ -55,15 +56,15 @@ class BottomNavNode(
         Profile,
     }
 
-    override fun buildChildNode(navTarget: Routing, nodeContext: NodeContext): Node<*> {
+    override fun resolve(navTarget: Routing, buildContext: BuildContext): Node {
         return when (navTarget) {
-            Routing.Home -> HomeNode(nodeContext = nodeContext)
-            Routing.Profile -> ProfileNode(nodeContext = nodeContext)
+            Routing.Home -> HomeNode(buildContext = buildContext)
+            Routing.Profile -> ProfileNode(buildContext = buildContext)
         }
     }
 
     @Composable
-    override fun Content(modifier: Modifier) {
+    override fun View(modifier: Modifier) {
         Box(modifier = modifier) {
             val counter = rememberSaveable { Random.nextInt(32) }
             Column(
@@ -74,7 +75,7 @@ class BottomNavNode(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(text = "Local UI state $counter")
-                AppyxNavigationContainer(appyxComponent = spotlight)
+                AppyxComponent(appyxComponent = spotlight)
             }
             Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
                 Box(

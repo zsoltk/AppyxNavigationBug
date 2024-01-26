@@ -12,32 +12,33 @@ import androidx.compose.ui.graphics.Color
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.BackStackModel
 import com.bumble.appyx.components.backstack.ui.slider.BackStackSlider
-import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
-import com.bumble.appyx.navigation.modality.NodeContext
+import com.bumble.appyx.navigation.composable.AppyxComponent
+import com.bumble.appyx.navigation.modality.BuildContext
 import com.bumble.appyx.navigation.node.Node
+import com.bumble.appyx.navigation.node.ParentNode
 import com.bumble.appyx.navigation.node.node
 
 class LoginNode(
-    nodeContext: NodeContext,
+    buildContext: BuildContext,
     private val backStack: BackStack<Routing> = BackStack(
         model = BackStackModel(
             initialTarget = Routing.Login,
-            savedStateMap = nodeContext.savedStateMap,
+            savedStateMap = buildContext.savedStateMap,
         ),
         visualisation = { BackStackSlider(it) }
     )
-) : Node<LoginNode.Routing>(
+) : ParentNode<LoginNode.Routing>(
     appyxComponent = backStack,
-    nodeContext = nodeContext,
+    buildContext = buildContext,
 ) {
 
     enum class Routing {
         Login,
     }
 
-    override fun buildChildNode(navTarget: Routing, nodeContext: NodeContext): Node<*> {
+    override fun resolve(navTarget: Routing, buildContext: BuildContext): Node {
         return when (navTarget) {
-            Routing.Login -> node(nodeContext = nodeContext) {
+            Routing.Login -> node(buildContext = buildContext) {
                 Box(
                     modifier = it
                         .fillMaxSize()
@@ -53,8 +54,8 @@ class LoginNode(
     }
 
     @Composable
-    override fun Content(modifier: Modifier) {
-        AppyxNavigationContainer(appyxComponent = backStack)
+    override fun View(modifier: Modifier) {
+        AppyxComponent(appyxComponent = backStack)
     }
 
 }

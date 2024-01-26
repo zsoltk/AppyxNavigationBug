@@ -15,23 +15,24 @@ import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.BackStackModel
 import com.bumble.appyx.components.backstack.operation.push
 import com.bumble.appyx.components.backstack.ui.slider.BackStackSlider
-import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
-import com.bumble.appyx.navigation.modality.NodeContext
+import com.bumble.appyx.navigation.composable.AppyxComponent
+import com.bumble.appyx.navigation.modality.BuildContext
 import com.bumble.appyx.navigation.node.Node
+import com.bumble.appyx.navigation.node.ParentNode
 import com.bumble.appyx.navigation.node.node
 import kotlin.random.Random
 
 class MainNode(
-    nodeContext: NodeContext,
+    buildContext: BuildContext,
     private val backStack: BackStack<Routing> = BackStack(
         model = BackStackModel(
             initialTarget = Routing.BottomNav,
-            savedStateMap = nodeContext.savedStateMap,
+            savedStateMap = buildContext.savedStateMap,
         ),
         visualisation = { BackStackSlider(it) }
     )
-) : Node<MainNode.Routing>(
-    nodeContext = nodeContext,
+) : ParentNode<MainNode.Routing>(
+    buildContext = buildContext,
     appyxComponent = backStack
 ) {
 
@@ -40,15 +41,15 @@ class MainNode(
         ModalNode,
     }
 
-    override fun buildChildNode(navTarget: Routing, nodeContext: NodeContext): Node<*> {
+    override fun resolve(navTarget: Routing, buildContext: BuildContext): Node {
         return when (navTarget) {
-            Routing.BottomNav -> BottomNavNode(nodeContext = nodeContext)
-            Routing.ModalNode -> node(nodeContext = nodeContext) { }
+            Routing.BottomNav -> BottomNavNode(buildContext = buildContext)
+            Routing.ModalNode -> node(buildContext = buildContext) { }
         }
     }
 
     @Composable
-    override fun Content(modifier: Modifier) {
+    override fun View(modifier: Modifier) {
         val counter = rememberSaveable { Random.nextInt(32) }
         Column(
             modifier = modifier
@@ -60,7 +61,7 @@ class MainNode(
             Button(onClick = { backStack.push(Routing.ModalNode) }) {
                 Text(text = "Modal $counter")
             }
-            AppyxNavigationContainer(appyxComponent = backStack)
+            AppyxComponent(appyxComponent = backStack)
         }
     }
 }

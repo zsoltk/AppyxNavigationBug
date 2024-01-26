@@ -9,7 +9,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,35 +16,36 @@ import androidx.compose.ui.graphics.Color
 import com.bumble.appyx.components.backstack.BackStack
 import com.bumble.appyx.components.backstack.BackStackModel
 import com.bumble.appyx.components.backstack.ui.slider.BackStackSlider
-import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
-import com.bumble.appyx.navigation.modality.NodeContext
+import com.bumble.appyx.navigation.composable.AppyxComponent
+import com.bumble.appyx.navigation.modality.BuildContext
 import com.bumble.appyx.navigation.node.Node
+import com.bumble.appyx.navigation.node.ParentNode
 import com.bumble.appyx.navigation.node.node
 import kotlin.random.Random
 
 class ProfileNode(
-    nodeContext: NodeContext,
+    buildContext: BuildContext,
     private val backStack: BackStack<Routing> = BackStack(
         model = BackStackModel(
             initialTarget = Routing.Profile,
-            savedStateMap = nodeContext.savedStateMap,
+            savedStateMap = buildContext.savedStateMap,
         ),
         visualisation = { BackStackSlider(it) },
     )
-) : Node<ProfileNode.Routing>(
+) : ParentNode<ProfileNode.Routing>(
     appyxComponent = backStack,
-    nodeContext = nodeContext,
+    buildContext = buildContext,
 ) {
 
     enum class Routing {
         Profile,
     }
 
-    override fun buildChildNode(navTarget: Routing, nodeContext: NodeContext): Node<*> {
+    override fun resolve(navTarget: Routing, buildContext: BuildContext): Node {
         return when (navTarget) {
             Routing.Profile -> {
-                node(nodeContext = nodeContext) {
-                    Log.i("ProfileNode", "buildChildNode: Routing.Profile")
+                node(buildContext = buildContext) {
+                    Log.i("ProfileNode", "resolve: Routing.Profile")
                     val (number, setNumber) = rememberSaveable { mutableIntStateOf(0) }
                     Column(
                         modifier = it
@@ -65,7 +65,7 @@ class ProfileNode(
     }
 
     @Composable
-    override fun Content(modifier: Modifier) {
+    override fun View(modifier: Modifier) {
         val counter = rememberSaveable { Random.nextInt(32) }
         Column(
             modifier = modifier
@@ -75,7 +75,7 @@ class ProfileNode(
             verticalArrangement = Arrangement.Center
         ) {
             Text(text = "Local UI state $counter")
-            AppyxNavigationContainer(appyxComponent = backStack)
+            AppyxComponent(appyxComponent = backStack)
         }
     }
 }
